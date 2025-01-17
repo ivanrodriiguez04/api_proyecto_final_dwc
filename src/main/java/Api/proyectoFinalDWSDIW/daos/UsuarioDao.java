@@ -20,7 +20,7 @@ public class UsuarioDao {
     private String nombreCompletoUsuario;
 
     @Column(name = "telefono_usuario")
-    private int telefonoUsuario;
+    private String telefonoUsuario;
 
     @Column(name = "rol_usuario")
     private String rolUsuario;
@@ -43,7 +43,7 @@ public class UsuarioDao {
     @Column(name = "foto_usuario", columnDefinition = "bytea")
     private byte[] fotoUsuario;
     //Constructores
-	public UsuarioDao(long idUsuario, String nombreCompletoUsuario, int telefonoUsuario, String rolUsuario,
+	public UsuarioDao(long idUsuario, String nombreCompletoUsuario, String telefonoUsuario, String rolUsuario,
 			String emailUsuario, String passwordUsuario, String dniUsuario, byte[] fotoDniFrontalUsuario,
 			byte[] fotoDniTraseroUsuario, byte[] fotoUsuario) {
 		super();
@@ -74,10 +74,10 @@ public class UsuarioDao {
 	public void setNombreCompletoUsuario(String nombreCompletoUsuario) {
 		this.nombreCompletoUsuario = nombreCompletoUsuario;
 	}
-	public int getTelefonoUsuario() {
+	public String getTelefonoUsuario() {
 		return telefonoUsuario;
 	}
-	public void setTelefonoUsuario(int telefonoUsuario) {
+	public void setTelefonoUsuario(String telefonoUsuario) {
 		this.telefonoUsuario = telefonoUsuario;
 	}
 	public String getRolUsuario() {

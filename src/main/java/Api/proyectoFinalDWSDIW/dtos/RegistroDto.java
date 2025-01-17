@@ -5,13 +5,14 @@ public class RegistroDto {
 	//Atributos
 	private long idUsuario;
 	private String nombreCompletoUsuario;
-	private int telefonoUsuario;
+	private String telefonoUsuario;
 	private String rolUsuario;
 	private String emailUsuario;
 	private String passwordUsuario;
 	private String dniUsuario;
-	//Faltan las tres fotos necesarias
-	
+	private byte[] fotoDniFrontalUsuario;
+	private byte[] fotoDniTraseroUsuario;
+	private byte[] fotoUsuario;
 	
 	//Getters & Setters
 	public long getIdUsuario() {
@@ -26,10 +27,10 @@ public class RegistroDto {
 	public void setNombreCompletoUsuario(String nombreCompletoUsuario) {
 		this.nombreCompletoUsuario = nombreCompletoUsuario;
 	}
-	public int getTelefonoUsuario() {
+	public String getTelefonoUsuario() {
 		return telefonoUsuario;
 	}
-	public void setTelefonoUsuario(int telefonoUsuario) {
+	public void setTelefonoUsuario(String telefonoUsuario) {
 		this.telefonoUsuario = telefonoUsuario;
 	}
 	public String getRolUsuario() {
@@ -55,6 +56,24 @@ public class RegistroDto {
 	}
 	public void setDniUsuario(String dniUsuario) {
 		this.dniUsuario = dniUsuario;
+	}
+	public byte[] getFotoDniFrontalUsuario() {
+		return fotoDniFrontalUsuario;
+	}
+	public void setFotoDniFrontalUsuario(byte[] fotoDniFrontalUsuario) {
+		this.fotoDniFrontalUsuario = fotoDniFrontalUsuario;
+	}
+	public byte[] getFotoDniTraseroUsuario() {
+		return fotoDniTraseroUsuario;
+	}
+	public void setFotoDniTraseroUsuario(byte[] fotoDniTraseroUsuario) {
+		this.fotoDniTraseroUsuario = fotoDniTraseroUsuario;
+	}
+	public byte[] getFotoUsuario() {
+		return fotoUsuario;
+	}
+	public void setFotoUsuario(byte[] fotoUsuario) {
+		this.fotoUsuario = fotoUsuario;
 	}
 	
 }
