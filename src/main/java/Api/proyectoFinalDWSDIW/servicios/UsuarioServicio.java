@@ -48,6 +48,9 @@ public class UsuarioServicio {
         usuario.setEmailUsuario(usuarioDto.getEmailUsuario());
         usuario.setPasswordUsuario(passwordEncoder.encode(usuarioDto.getPasswordUsuario()));
         usuario.setRolUsuario("usuario");
+        usuario.setFotoDniFrontalUsuario(usuarioDto.getFotoDniFrontalUsuario());
+        usuario.setFotoDniTraseroUsuario(usuarioDto.getFotoDniTraseroUsuario());
+        usuario.setFotoUsuario(usuarioDto.getFotoUsuario());
 
         usuarioRepositorio.save(usuario);
     }
