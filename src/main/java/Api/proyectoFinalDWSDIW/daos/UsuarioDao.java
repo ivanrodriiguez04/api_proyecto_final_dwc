@@ -43,15 +43,13 @@ public class UsuarioDao {
     @Column(name = "foto_usuario", columnDefinition = "bytea")
     private byte[] fotoUsuario;
     
-    @Column(name = "token_recuperacion", length = 100, nullable = true)
-    private String tokenRecuperacion;
     //Constructores
     public UsuarioDao() {
     	
     }
     public UsuarioDao(long idUsuario, String nombreCompletoUsuario, String telefonoUsuario, String rolUsuario,
 			String emailUsuario, String passwordUsuario, String dniUsuario, byte[] fotoDniFrontalUsuario,
-			byte[] fotoDniTraseroUsuario, byte[] fotoUsuario, String tokenRecuperacion) {
+			byte[] fotoDniTraseroUsuario, byte[] fotoUsuario) {
 		super();
 		this.idUsuario = idUsuario;
 		this.nombreCompletoUsuario = nombreCompletoUsuario;
@@ -63,7 +61,6 @@ public class UsuarioDao {
 		this.fotoDniFrontalUsuario = fotoDniFrontalUsuario;
 		this.fotoDniTraseroUsuario = fotoDniTraseroUsuario;
 		this.fotoUsuario = fotoUsuario;
-		this.tokenRecuperacion = tokenRecuperacion;
 	}
 	//Getters & Setters
 	public long getIdUsuario() {
@@ -125,12 +122,6 @@ public class UsuarioDao {
 	}
 	public void setFotoUsuario(byte[] fotoUsuario) {
 		this.fotoUsuario = fotoUsuario;
-	}
-    public String getTokenRecuperacion() {
-		return tokenRecuperacion;
-	}
-	public void setTokenRecuperacion(String tokenRecuperacion) {
-		this.tokenRecuperacion = tokenRecuperacion;
 	}
 	//Metodo ToString
 	@Override

@@ -1,7 +1,5 @@
 package Api.proyectoFinalDWSDIW.servicios;
 
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,8 +16,6 @@ public class UsuarioServicio {
     private UsuarioRepositorio usuarioRepositorio;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private EmailServicio emailServicio;
     
     public ResponseEntity<String> validarCredenciales(String emailUsuario, String passwordUsuario) {
         UsuarioDao usuario = usuarioRepositorio.findByEmailUsuario(emailUsuario);
@@ -55,39 +51,6 @@ public class UsuarioServicio {
         usuario.setFotoDniTraseroUsuario(usuarioDto.getFotoDniTraseroUsuario());
         usuario.setFotoUsuario(usuarioDto.getFotoUsuario());
 
-        usuarioRepositorio.save(usuario);
-    }
-    public void enviarEmailRecuperacion(String emailUsuario) {
-        UsuarioDao usuario = usuarioRepositorio.findByEmailUsuario(emailUsuario);
-
-        if (usuario == null) {
-            throw new IllegalArgumentException("El email no está registrado.");
-        }
-
-        // Generar un token de recuperación
-        String tokenRecuperacion = UUID.randomUUID().toString();
-
-        // Guardar el token en la base de datos
-        usuario.setTokenRecuperacion(tokenRecuperacion);
-        usuarioRepositorio.save(usuario);
-
-        // Enviar el correo
-        String enlaceRecuperacion = "http://localhost:8081/restablecer-password?token=" + tokenRecuperacion;
-        String mensaje = "Haz clic en este enlace para restablecer tu contraseña: " + enlaceRecuperacion;
-        emailServicio.enviarCorreo(emailUsuario, "Recuperación de contraseña", mensaje);
-    }
-
-    
-    public void restablecerPassword(String token, String nuevaPassword) {
-        UsuarioDao usuario = usuarioRepositorio.findByTokenRecuperacion(token);
-
-        if (usuario == null) {
-            throw new IllegalArgumentException("Token inválido o expirado.");
-        }
-
-        // Actualizar contraseña
-        usuario.setPasswordUsuario(passwordEncoder.encode(nuevaPassword));
-        usuario.setTokenRecuperacion(null); // Limpiar el token después del uso
         usuarioRepositorio.save(usuario);
     }
 

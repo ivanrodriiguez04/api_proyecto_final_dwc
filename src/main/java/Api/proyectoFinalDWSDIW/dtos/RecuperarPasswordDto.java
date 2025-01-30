@@ -1,22 +1,16 @@
 package Api.proyectoFinalDWSDIW.dtos;
 
 public class RecuperarPasswordDto {
-	private String token;
-    private String nuevaPassword;
+	//Atributos
+	private String emailUsuario;
+	//Getters & Setters
 
-    public String getToken() {
-        return token;
-    }
+	public String getEmailUsuario() {
+		return emailUsuario;
+	}
 
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getNuevaPassword() {
-        return nuevaPassword;
-    }
-
-    public void setNuevaPassword(String nuevaPassword) {
-        this.nuevaPassword = nuevaPassword;
-    }
+	public void setEmailUsuario(String emailUsuario) {
+		this.emailUsuario = emailUsuario;
+	}
+	
 }
