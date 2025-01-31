@@ -24,9 +24,10 @@ public class TokenDao {
     private String token;
 
     @OneToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", nullable = false)
     private UsuarioDao usuario;
 
+    @Column(nullable = false)
     private LocalDateTime fechaExpiracion;
 
     public boolean estaExpirado() {

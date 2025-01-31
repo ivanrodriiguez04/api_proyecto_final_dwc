@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import Api.proyectoFinalDWSDIW.daos.UsuarioDao;
 import Api.proyectoFinalDWSDIW.dtos.RegistroDto;
+import Api.proyectoFinalDWSDIW.repositorios.TokenRepositorio;
 import Api.proyectoFinalDWSDIW.repositorios.UsuarioRepositorio;
 
 @Service
@@ -16,6 +18,8 @@ public class UsuarioServicio {
     private UsuarioRepositorio usuarioRepositorio;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private TokenRepositorio tokenRepositorio;
     
     public ResponseEntity<String> validarCredenciales(String emailUsuario, String passwordUsuario) {
         UsuarioDao usuario = usuarioRepositorio.findByEmailUsuario(emailUsuario);
@@ -54,4 +58,27 @@ public class UsuarioServicio {
         usuarioRepositorio.save(usuario);
     }
 
+    @Transactional
+    public boolean actualizarPassword(String token, String nuevaPassword) {
+        // Buscar usuario por el token
+        UsuarioDao usuario = usuarioRepositorio.findByToken(token);
+
+        if (usuario == null) {
+            System.err.println("ERROR: Token inválido o usuario no encontrado.");
+            return false;
+        }
+
+        // Encriptar la nueva contraseña
+        String passwordEncriptada = passwordEncoder.encode(nuevaPassword);
+        usuario.setPasswordUsuario(passwordEncriptada);
+
+        // Guardar la nueva contraseña en la base de datos
+        usuarioRepositorio.save(usuario);
+
+        // Eliminar el token de la base de datos después de usarlo
+        tokenRepositorio.deleteByToken(token);
+
+        System.out.println("Contraseña actualizada con éxito para el usuario: " + usuario.getEmailUsuario());
+        return true;
+    }
 }

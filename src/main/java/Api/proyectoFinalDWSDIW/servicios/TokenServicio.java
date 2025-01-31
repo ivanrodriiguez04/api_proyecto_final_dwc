@@ -51,7 +51,7 @@ public class TokenServicio {
             tokenRepositorio.save(tokenDao);
         }
 
-        String enlaceRecuperacion = "http://localhost:8081/api/autenticacion/restablecer-clave?token=" + token;
+        String enlaceRecuperacion = "http://localhost:8080/vistaProyectoFinal2/restablecerPassword.jsp?token=" + token;
         emailServicio.enviarCorreo(emailUsuario, "Recuperación de Clave", "Usa este enlace para restablecer tu clave: " + enlaceRecuperacion);
     }
 
