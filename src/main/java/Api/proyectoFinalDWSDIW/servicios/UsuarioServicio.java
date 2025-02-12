@@ -91,6 +91,28 @@ public class UsuarioServicio {
     }
     
     public void guardarRegistroTemporal(RegistroDto usuarioDto, String token, LocalDateTime fechaExpiracion) {
+        System.out.println("🔍 Recibiendo datos del usuario...");
+
+        // 🛠️ Verificar si las imágenes llegan del frontend
+        if (usuarioDto.getFotoDniFrontalUsuario() == null) {
+            System.out.println("⚠️ La imagen frontal del DNI es NULL");
+        } else {
+            System.out.println("✅ Imagen frontal del DNI recibida");
+        }
+
+        if (usuarioDto.getFotoDniTraseroUsuario() == null) {
+            System.out.println("⚠️ La imagen trasera del DNI es NULL");
+        } else {
+            System.out.println("✅ Imagen trasera del DNI recibida");
+        }
+
+        if (usuarioDto.getFotoUsuario() == null) {
+            System.out.println("⚠️ La foto del usuario es NULL");
+        } else {
+            System.out.println("✅ Foto del usuario recibida");
+        }
+
+        // Crear el usuario temporal
         UsuarioDao usuario = new UsuarioDao();
         usuario.setNombreCompletoUsuario(usuarioDto.getNombreCompletoUsuario());
         usuario.setDniUsuario(usuarioDto.getDniUsuario());
@@ -98,11 +120,17 @@ public class UsuarioServicio {
         usuario.setEmailUsuario(usuarioDto.getEmailUsuario());
         usuario.setPasswordUsuario(passwordEncoder.encode(usuarioDto.getPasswordUsuario()));
         usuario.setRolUsuario("usuario");
-        usuario.setConfirmado(false); // ❌ IMPORTANTE: No debe poder iniciar sesión todavía
+        usuario.setConfirmado(false); // Usuario aún no confirmado
 
-        usuarioRepositorio.save(usuario); // Guardamos el usuario
-        System.out.println("✅ Usuario guardado en la BD: " + usuario.getEmailUsuario());
+        // Asignar imágenes
+        usuario.setFotoDniFrontalUsuario(usuarioDto.getFotoDniFrontalUsuario());
+        usuario.setFotoDniTraseroUsuario(usuarioDto.getFotoDniTraseroUsuario());
+        usuario.setFotoUsuario(usuarioDto.getFotoUsuario());
 
+        usuarioRepositorio.save(usuario);
+        System.out.println("✅ Usuario guardado con éxito.");
+
+        // Crear y guardar el registro temporal
         RegistroTemporalDao registroTemporal = new RegistroTemporalDao();
         registroTemporal.setUsuario(usuario);
         registroTemporal.setToken(token);
@@ -111,6 +139,7 @@ public class UsuarioServicio {
         registroTemporalRepositorio.save(registroTemporal);
         System.out.println("✅ Registro temporal guardado con token: " + token);
     }
+
 
 
     @Transactional
