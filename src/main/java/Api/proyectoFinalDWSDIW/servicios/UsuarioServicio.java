@@ -1,13 +1,18 @@
 package Api.proyectoFinalDWSDIW.servicios;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import Api.proyectoFinalDWSDIW.daos.RegistroTemporalDao;
 import Api.proyectoFinalDWSDIW.daos.UsuarioDao;
 import Api.proyectoFinalDWSDIW.dtos.RegistroDto;
+import Api.proyectoFinalDWSDIW.repositorios.RegistroTemporalRepositorio;
 import Api.proyectoFinalDWSDIW.repositorios.TokenRepositorio;
 import Api.proyectoFinalDWSDIW.repositorios.UsuarioRepositorio;
 
@@ -20,6 +25,9 @@ public class UsuarioServicio {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private TokenRepositorio tokenRepositorio;
+    @Autowired
+    private RegistroTemporalRepositorio registroTemporalRepositorio;
+
     
     public ResponseEntity<String> validarCredenciales(String emailUsuario, String passwordUsuario) {
         UsuarioDao usuario = usuarioRepositorio.findByEmailUsuario(emailUsuario);
@@ -81,4 +89,67 @@ public class UsuarioServicio {
         System.out.println("Contraseña actualizada con éxito para el usuario: " + usuario.getEmailUsuario());
         return true;
     }
+    
+    public void guardarRegistroTemporal(RegistroDto usuarioDto, String token, LocalDateTime fechaExpiracion) {
+        UsuarioDao usuario = new UsuarioDao();
+        usuario.setNombreCompletoUsuario(usuarioDto.getNombreCompletoUsuario());
+        usuario.setDniUsuario(usuarioDto.getDniUsuario());
+        usuario.setTelefonoUsuario(usuarioDto.getTelefonoUsuario());
+        usuario.setEmailUsuario(usuarioDto.getEmailUsuario());
+        usuario.setPasswordUsuario(passwordEncoder.encode(usuarioDto.getPasswordUsuario()));
+        usuario.setRolUsuario("usuario");
+        usuario.setConfirmado(false); // ❌ IMPORTANTE: No debe poder iniciar sesión todavía
+
+        usuarioRepositorio.save(usuario); // Guardamos el usuario
+        System.out.println("✅ Usuario guardado en la BD: " + usuario.getEmailUsuario());
+
+        RegistroTemporalDao registroTemporal = new RegistroTemporalDao();
+        registroTemporal.setUsuario(usuario);
+        registroTemporal.setToken(token);
+        registroTemporal.setFechaExpiracion(fechaExpiracion);
+
+        registroTemporalRepositorio.save(registroTemporal);
+        System.out.println("✅ Registro temporal guardado con token: " + token);
+    }
+
+
+    @Transactional
+    public boolean confirmarRegistro(String token) {
+        // 1️⃣ Buscar el registro temporal asociado al token
+        Optional<RegistroTemporalDao> optionalRegistroTemporal = registroTemporalRepositorio.findByToken(token);
+
+        if (optionalRegistroTemporal.isEmpty()) {
+            System.out.println("⚠️ Token no encontrado en la base de datos.");
+            return false;
+        }
+
+        RegistroTemporalDao registroTemporal = optionalRegistroTemporal.get();
+
+        if (registroTemporal.getFechaExpiracion().isBefore(LocalDateTime.now())) {
+            System.out.println("⚠️ Token expirado.");
+            return false;
+        }
+
+        // 2️⃣ Obtener el usuario asociado al registro temporal
+        UsuarioDao usuario = registroTemporal.getUsuario();
+
+        if (usuario == null) {
+            System.out.println("⚠️ Usuario no encontrado en la base de datos.");
+            return false;
+        }
+
+        // 3️⃣ Confirmar el usuario
+        usuario.setConfirmado(true);
+        usuarioRepositorio.save(usuario); // Guardamos el cambio en la base de datos
+        System.out.println("✅ Usuario confirmado exitosamente: " + usuario.getEmailUsuario());
+
+        // 4️⃣ Eliminar el registro temporal después de confirmar
+        registroTemporalRepositorio.delete(registroTemporal);
+        System.out.println("✅ Registro temporal eliminado.");
+
+        return true;
+    }
+
+
+
 }

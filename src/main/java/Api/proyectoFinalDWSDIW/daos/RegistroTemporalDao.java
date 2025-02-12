@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,20 +13,18 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tokens",schema="proyecto_final")
-public class TokenDao {
-	//Atributos
-	@Id
+@Table(name = "registro_temporal", schema = "proyecto_final")
+public class RegistroTemporalDao {
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_token", updatable = false)
-    private Long idToken;
+    private Long id;
+
+    @OneToOne(fetch = FetchType.EAGER) // 🚀 IMPORTANTE: Asegura que siempre cargue el usuario
+    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", nullable = false)
+    private UsuarioDao usuario;
 
     @Column(nullable = false, unique = true)
     private String token;
-
-    @OneToOne
-    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", nullable = true)
-    private UsuarioDao usuario;
 
     @Column(nullable = false)
     private LocalDateTime fechaExpiracion;
@@ -33,22 +32,13 @@ public class TokenDao {
     public boolean estaExpirado() {
         return fechaExpiracion.isBefore(LocalDateTime.now());
     }
-    //Getters & Setters
 
-	public Long getIdToken() {
-		return idToken;
+	public Long getId() {
+		return id;
 	}
 
-	public void setIdToken(Long idToken) {
-		this.idToken = idToken;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public UsuarioDao getUsuario() {
@@ -59,6 +49,14 @@ public class TokenDao {
 		this.usuario = usuario;
 	}
 
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
 	public LocalDateTime getFechaExpiracion() {
 		return fechaExpiracion;
 	}
@@ -67,4 +65,7 @@ public class TokenDao {
 		this.fechaExpiracion = fechaExpiracion;
 	}
 
+    // Getters y Setters
+    
 }
+

@@ -42,14 +42,16 @@ public class UsuarioDao {
 
     @Column(name = "foto_usuario", columnDefinition = "bytea")
     private byte[] fotoUsuario;
-    
-    //Constructores
+    @Column(name = "confirmado", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean confirmado = false;
+
     public UsuarioDao() {
     	
     }
-    public UsuarioDao(long idUsuario, String nombreCompletoUsuario, String telefonoUsuario, String rolUsuario,
+    
+	public UsuarioDao(long idUsuario, String nombreCompletoUsuario, String telefonoUsuario, String rolUsuario,
 			String emailUsuario, String passwordUsuario, String dniUsuario, byte[] fotoDniFrontalUsuario,
-			byte[] fotoDniTraseroUsuario, byte[] fotoUsuario) {
+			byte[] fotoDniTraseroUsuario, byte[] fotoUsuario, boolean confirmado) {
 		super();
 		this.idUsuario = idUsuario;
 		this.nombreCompletoUsuario = nombreCompletoUsuario;
@@ -61,7 +63,9 @@ public class UsuarioDao {
 		this.fotoDniFrontalUsuario = fotoDniFrontalUsuario;
 		this.fotoDniTraseroUsuario = fotoDniTraseroUsuario;
 		this.fotoUsuario = fotoUsuario;
+		this.confirmado = confirmado;
 	}
+
 	//Getters & Setters
 	public long getIdUsuario() {
 		return idUsuario;
@@ -123,13 +127,11 @@ public class UsuarioDao {
 	public void setFotoUsuario(byte[] fotoUsuario) {
 		this.fotoUsuario = fotoUsuario;
 	}
-	//Metodo ToString
-	@Override
-	public String toString() {
-		return "UsuarioDao [idUsuario=" + idUsuario + ", nombreCompletoUsuario=" + nombreCompletoUsuario
-				+ ", telefonoUsuario=" + telefonoUsuario + ", rolUsuario=" + rolUsuario + ", emailUsuario="
-				+ emailUsuario + ", passwordUsuario=" + passwordUsuario + ", dniUsuario=" + dniUsuario
-				+"]";
+	public boolean isConfirmado() {
+	    return confirmado;
 	}
-	
+
+	public void setConfirmado(boolean confirmado) {
+	    this.confirmado = confirmado;
+	}
 }

@@ -1,20 +1,37 @@
 package Api.proyectoFinalDWSDIW.controladores;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import Api.proyectoFinalDWSDIW.daos.RegistroTemporalDao;
+import Api.proyectoFinalDWSDIW.daos.UsuarioDao;
 import Api.proyectoFinalDWSDIW.dtos.RegistroDto;
+import Api.proyectoFinalDWSDIW.repositorios.RegistroTemporalRepositorio;
+import Api.proyectoFinalDWSDIW.repositorios.UsuarioRepositorio;
+import Api.proyectoFinalDWSDIW.servicios.EmailServicio;
 import Api.proyectoFinalDWSDIW.servicios.UsuarioServicio;
 
 @RestController
 @RequestMapping("/api/registro")
 public class RegistroControlador {
-
+	@Autowired
+    private UsuarioRepositorio usuarioRepositorio;
+	@Autowired
+	private RegistroTemporalRepositorio registroTemporalRepositorio;
+	@Autowired
+	private EmailServicio emailServicio;
     @Autowired
     private UsuarioServicio usuarioServicio;
 
@@ -29,13 +46,42 @@ public class RegistroControlador {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("El email ya está registrado.");
             }
 
-            usuarioServicio.registroUsuario(usuarioDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado exitosamente.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+            String token = UUID.randomUUID().toString();
+            LocalDateTime fechaExpiracion = LocalDateTime.now().plusDays(7);
+
+            usuarioServicio.guardarRegistroTemporal(usuarioDto, token, fechaExpiracion);
+            
+            String enlaceConfirmacion = "http://localhost:8081/api/registro/confirmar?token=" + token;
+            emailServicio.enviarCorreo(usuarioDto.getEmailUsuario(), "Confirma tu cuenta", 
+                "Haz clic en el siguiente enlace para activar tu cuenta: " + enlaceConfirmacion);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body("Correo de confirmación enviado.");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor.");
         }
     }
+
+    @GetMapping("/confirmar")
+    public ResponseEntity<Object> confirmarUsuario(@RequestParam("token") String token) {
+        boolean confirmado = usuarioServicio.confirmarRegistro(token);
+
+        if (confirmado) {
+            System.out.println("✅ Usuario confirmado correctamente. Redirigiendo...");
+
+            // Redirigir a la página de inicio de sesión del frontend
+            return ResponseEntity.status(302)
+                    .header("Location", "http://localhost:8080/vistaProyectoFinal2/inicioSesion.jsp")
+                    .build();
+        } else {
+            System.out.println("⚠️ Token inválido o expirado. No se puede confirmar el usuario.");
+
+            // Redirigir a una página de error en el frontend
+            return ResponseEntity.status(302)
+                    .header("Location", "http://localhost:8080/vistaProyectoFinal2/index.jsp")
+                    .build();
+        }
+    }
+
+
 }
