@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "transferencia", schema = "proyecto_final")
+@Table(name = "transferencia", schema = "logica_proyecto_final")
 public class TransferenciaDao {
 	//Atributos
 	@Id

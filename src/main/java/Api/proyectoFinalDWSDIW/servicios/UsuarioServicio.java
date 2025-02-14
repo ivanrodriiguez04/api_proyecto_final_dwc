@@ -93,25 +93,6 @@ public class UsuarioServicio {
     public void guardarRegistroTemporal(RegistroDto usuarioDto, String token, LocalDateTime fechaExpiracion) {
         System.out.println("🔍 Recibiendo datos del usuario...");
 
-        // 🛠️ Verificar si las imágenes llegan del frontend
-        if (usuarioDto.getFotoDniFrontalUsuario() == null) {
-            System.out.println("⚠️ La imagen frontal del DNI es NULL");
-        } else {
-            System.out.println("✅ Imagen frontal del DNI recibida");
-        }
-
-        if (usuarioDto.getFotoDniTraseroUsuario() == null) {
-            System.out.println("⚠️ La imagen trasera del DNI es NULL");
-        } else {
-            System.out.println("✅ Imagen trasera del DNI recibida");
-        }
-
-        if (usuarioDto.getFotoUsuario() == null) {
-            System.out.println("⚠️ La foto del usuario es NULL");
-        } else {
-            System.out.println("✅ Foto del usuario recibida");
-        }
-
         // Crear el usuario temporal
         UsuarioDao usuario = new UsuarioDao();
         usuario.setNombreCompletoUsuario(usuarioDto.getNombreCompletoUsuario());
