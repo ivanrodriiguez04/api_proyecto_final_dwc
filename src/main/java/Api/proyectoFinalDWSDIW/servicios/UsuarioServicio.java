@@ -28,15 +28,10 @@ public class UsuarioServicio {
     @Autowired
     private RegistroTemporalRepositorio registroTemporalRepositorio;
 
-    
     public ResponseEntity<String> validarCredenciales(String emailUsuario, String passwordUsuario) {
         UsuarioDao usuario = usuarioRepositorio.findByEmailUsuario(emailUsuario);
 
-        if (usuario == null) {
-            return ResponseEntity.status(401).body("Credenciales incorrectas");
-        }
-
-        if (!passwordEncoder.matches(passwordUsuario, usuario.getPasswordUsuario())) {
+        if (usuario == null || !passwordEncoder.matches(passwordUsuario, usuario.getPasswordUsuario())) {
             return ResponseEntity.status(401).body("Credenciales incorrectas");
         }
 
@@ -59,9 +54,6 @@ public class UsuarioServicio {
         usuario.setEmailUsuario(usuarioDto.getEmailUsuario());
         usuario.setPasswordUsuario(passwordEncoder.encode(usuarioDto.getPasswordUsuario()));
         usuario.setRolUsuario("usuario");
-        usuario.setFotoDniFrontalUsuario(usuarioDto.getFotoDniFrontalUsuario());
-        usuario.setFotoDniTraseroUsuario(usuarioDto.getFotoDniTraseroUsuario());
-        usuario.setFotoUsuario(usuarioDto.getFotoUsuario());
 
         usuarioRepositorio.save(usuario);
     }
@@ -103,10 +95,6 @@ public class UsuarioServicio {
         usuario.setRolUsuario("usuario");
         usuario.setConfirmado(false); // Usuario aún no confirmado
 
-        // Asignar imágenes
-        usuario.setFotoDniFrontalUsuario(usuarioDto.getFotoDniFrontalUsuario());
-        usuario.setFotoDniTraseroUsuario(usuarioDto.getFotoDniTraseroUsuario());
-        usuario.setFotoUsuario(usuarioDto.getFotoUsuario());
 
         usuarioRepositorio.save(usuario);
         System.out.println("✅ Usuario guardado con éxito.");

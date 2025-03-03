@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "usuario", schema = "proyecto_final")
+@Table(name = "usuario", schema = "proyecto_final_usuarios")
 public class UsuarioDao {
 	//Atributos
 	@Id
@@ -33,15 +33,6 @@ public class UsuarioDao {
 
     @Column(name = "dni_usuario", unique = true, length = 9)
     private String dniUsuario;
-
-    @Column(name = "foto_dni_frontal_usuario", columnDefinition = "bytea")
-    private byte[] fotoDniFrontalUsuario;
-
-    @Column(name = "foto_dni_trasero_usuario", columnDefinition = "bytea")
-    private byte[] fotoDniTraseroUsuario;
-
-    @Column(name = "foto_usuario", columnDefinition = "bytea")
-    private byte[] fotoUsuario;
     @Column(name = "confirmado", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean confirmado = false;
 
@@ -50,8 +41,7 @@ public class UsuarioDao {
     }
     
 	public UsuarioDao(long idUsuario, String nombreCompletoUsuario, String telefonoUsuario, String rolUsuario,
-			String emailUsuario, String passwordUsuario, String dniUsuario, byte[] fotoDniFrontalUsuario,
-			byte[] fotoDniTraseroUsuario, byte[] fotoUsuario, boolean confirmado) {
+			String emailUsuario, String passwordUsuario, String dniUsuario, boolean confirmado) {
 		super();
 		this.idUsuario = idUsuario;
 		this.nombreCompletoUsuario = nombreCompletoUsuario;
@@ -60,9 +50,6 @@ public class UsuarioDao {
 		this.emailUsuario = emailUsuario;
 		this.passwordUsuario = passwordUsuario;
 		this.dniUsuario = dniUsuario;
-		this.fotoDniFrontalUsuario = fotoDniFrontalUsuario;
-		this.fotoDniTraseroUsuario = fotoDniTraseroUsuario;
-		this.fotoUsuario = fotoUsuario;
 		this.confirmado = confirmado;
 	}
 
@@ -109,28 +96,9 @@ public class UsuarioDao {
 	public void setDniUsuario(String dniUsuario) {
 		this.dniUsuario = dniUsuario;
 	}
-	public byte[] getFotoDniFrontalUsuario() {
-		return fotoDniFrontalUsuario;
-	}
-	public void setFotoDniFrontalUsuario(byte[] fotoDniFrontalUsuario) {
-		this.fotoDniFrontalUsuario = fotoDniFrontalUsuario;
-	}
-	public byte[] getFotoDniTraseroUsuario() {
-		return fotoDniTraseroUsuario;
-	}
-	public void setFotoDniTraseroUsuario(byte[] fotoDniTraseroUsuario) {
-		this.fotoDniTraseroUsuario = fotoDniTraseroUsuario;
-	}
-	public byte[] getFotoUsuario() {
-		return fotoUsuario;
-	}
-	public void setFotoUsuario(byte[] fotoUsuario) {
-		this.fotoUsuario = fotoUsuario;
-	}
 	public boolean isConfirmado() {
 	    return confirmado;
 	}
-
 	public void setConfirmado(boolean confirmado) {
 	    this.confirmado = confirmado;
 	}

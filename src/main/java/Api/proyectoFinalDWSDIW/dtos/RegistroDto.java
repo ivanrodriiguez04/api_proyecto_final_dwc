@@ -10,9 +10,6 @@ public class RegistroDto {
 	private String emailUsuario;
 	private String passwordUsuario;
 	private String dniUsuario;
-	private byte[] fotoDniFrontalUsuario;
-	private byte[] fotoDniTraseroUsuario;
-	private byte[] fotoUsuario;
 	
 	//Getters & Setters
 	public long getIdUsuario() {
@@ -57,23 +54,4 @@ public class RegistroDto {
 	public void setDniUsuario(String dniUsuario) {
 		this.dniUsuario = dniUsuario;
 	}
-	public byte[] getFotoDniFrontalUsuario() {
-		return fotoDniFrontalUsuario;
-	}
-	public void setFotoDniFrontalUsuario(byte[] fotoDniFrontalUsuario) {
-		this.fotoDniFrontalUsuario = fotoDniFrontalUsuario;
-	}
-	public byte[] getFotoDniTraseroUsuario() {
-		return fotoDniTraseroUsuario;
-	}
-	public void setFotoDniTraseroUsuario(byte[] fotoDniTraseroUsuario) {
-		this.fotoDniTraseroUsuario = fotoDniTraseroUsuario;
-	}
-	public byte[] getFotoUsuario() {
-		return fotoUsuario;
-	}
-	public void setFotoUsuario(byte[] fotoUsuario) {
-		this.fotoUsuario = fotoUsuario;
-	}
-	
 }

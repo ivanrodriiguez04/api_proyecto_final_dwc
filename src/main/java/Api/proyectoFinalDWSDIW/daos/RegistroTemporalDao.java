@@ -13,7 +13,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "registro_temporal", schema = "logica_proyecto_final")
+@Table(name = "registro_temporal", schema = "logica_proyecto_final_dwc")
 public class RegistroTemporalDao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

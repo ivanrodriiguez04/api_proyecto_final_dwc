@@ -12,7 +12,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tokens",schema="logica_proyecto_final")
+@Table(name = "tokens",schema="logica_proyecto_final_dwc")
 public class TokenDao {
 	//Atributos
 	@Id

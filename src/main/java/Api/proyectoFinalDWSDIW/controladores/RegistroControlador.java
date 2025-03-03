@@ -61,27 +61,14 @@ public class RegistroControlador {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor.");
         }
     }
-
     @GetMapping("/confirmar")
-    public ResponseEntity<Object> confirmarUsuario(@RequestParam("token") String token) {
+    public ResponseEntity<String> confirmarUsuario(@RequestParam("token") String token) {
         boolean confirmado = usuarioServicio.confirmarRegistro(token);
 
         if (confirmado) {
-            System.out.println("✅ Usuario confirmado correctamente. Redirigiendo...");
-
-            // Redirigir a la página de inicio de sesión del frontend
-            return ResponseEntity.status(302)
-                    .header("Location", "http://localhost:8080/vistaProyectoFinal2/inicioSesion.jsp")
-                    .build();
+            return ResponseEntity.ok("Cuenta confirmada. Inicia sesión en http://localhost:4200/login");
         } else {
-            System.out.println("⚠️ Token inválido o expirado. No se puede confirmar el usuario.");
-
-            // Redirigir a una página de error en el frontend
-            return ResponseEntity.status(302)
-                    .header("Location", "http://localhost:8080/vistaProyectoFinal2/index.jsp")
-                    .build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido o expirado.");
         }
     }
-
-
 }
