@@ -18,19 +18,24 @@ import Api.proyectoFinalDWSDIW.servicios.UsuarioServicio;
 @RequestMapping("/api/password")
 public class RecuperarPasswordControlador {
 
-	@Autowired
+    @Autowired
     private UsuarioServicio usuarioServicio;
-	@Autowired
+    @Autowired
     private TokenServicio tokenServicio;
 
     @PostMapping("/recuperar")
-    public ResponseEntity<String> recuperarClave(@RequestBody RecuperarPasswordDto solicitud) {
-    	tokenServicio.enviarCorreoRecuperacion(solicitud.getEmailUsuario());
-        return ResponseEntity.ok("Se ha enviado un correo con instrucciones para recuperar la clave.");
+    public ResponseEntity<?> recuperarClave(@RequestBody RecuperarPasswordDto solicitud) {
+        try {
+            tokenServicio.enviarCorreoRecuperacion(solicitud.getEmailUsuario());
+            return ResponseEntity.ok(Map.of("mensaje", "Se ha enviado un correo con instrucciones para recuperar la clave."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error al enviar el correo: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/restablecer")
-    public ResponseEntity<String> restablecerPassword(@RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<?> restablecerPassword(@RequestBody Map<String, String> requestBody) {
         String token = requestBody.get("token");
         String nuevaPassword = requestBody.get("passwordUsuario");
 
@@ -38,11 +43,15 @@ public class RecuperarPasswordControlador {
         System.out.println("Nueva contraseña en la API: " + nuevaPassword);
 
         if (nuevaPassword == null || nuevaPassword.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: La contraseña no puede estar vacía.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "La contraseña no puede estar vacía."));
         }
 
-        usuarioServicio.actualizarPassword(token, nuevaPassword);
-        return ResponseEntity.ok("Contraseña restablecida con éxito.");
+        boolean actualizado = usuarioServicio.actualizarPassword(token, nuevaPassword);
+        
+        if (actualizado) {
+            return ResponseEntity.ok(Map.of("mensaje", "Contraseña restablecida con éxito."));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Token inválido o usuario no encontrado."));
+        }
     }
-
 }

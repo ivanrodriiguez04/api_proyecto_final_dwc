@@ -28,6 +28,7 @@ public class UsuarioServicio {
     @Autowired
     private RegistroTemporalRepositorio registroTemporalRepositorio;
 
+    //LOGIN
     public ResponseEntity<String> validarCredenciales(String emailUsuario, String passwordUsuario) {
         UsuarioDao usuario = usuarioRepositorio.findByEmailUsuario(emailUsuario);
 
@@ -42,6 +43,7 @@ public class UsuarioServicio {
         return usuarioRepositorio.existsByEmailUsuario(emailUsuario);
     }
 
+    //REGISTRO
     public void registroUsuario(RegistroDto usuarioDto) {
         if (usuarioDto.getEmailUsuario() == null || usuarioDto.getEmailUsuario().isEmpty()) {
             throw new IllegalArgumentException("El email es obligatorio.");
@@ -60,7 +62,6 @@ public class UsuarioServicio {
 
     @Transactional
     public boolean actualizarPassword(String token, String nuevaPassword) {
-        // Buscar usuario por el token
         UsuarioDao usuario = usuarioRepositorio.findByToken(token);
 
         if (usuario == null) {
@@ -68,14 +69,8 @@ public class UsuarioServicio {
             return false;
         }
 
-        // Encriptar la nueva contraseña
-        String passwordEncriptada = passwordEncoder.encode(nuevaPassword);
-        usuario.setPasswordUsuario(passwordEncriptada);
-
-        // Guardar la nueva contraseña en la base de datos
+        usuario.setPasswordUsuario(passwordEncoder.encode(nuevaPassword));
         usuarioRepositorio.save(usuario);
-
-        // Eliminar el token de la base de datos después de usarlo
         tokenRepositorio.deleteByToken(token);
 
         System.out.println("Contraseña actualizada con éxito para el usuario: " + usuario.getEmailUsuario());
@@ -85,7 +80,6 @@ public class UsuarioServicio {
     public void guardarRegistroTemporal(RegistroDto usuarioDto, String token, LocalDateTime fechaExpiracion) {
         System.out.println("🔍 Recibiendo datos del usuario...");
 
-        // Crear el usuario temporal
         UsuarioDao usuario = new UsuarioDao();
         usuario.setNombreCompletoUsuario(usuarioDto.getNombreCompletoUsuario());
         usuario.setDniUsuario(usuarioDto.getDniUsuario());
@@ -93,13 +87,11 @@ public class UsuarioServicio {
         usuario.setEmailUsuario(usuarioDto.getEmailUsuario());
         usuario.setPasswordUsuario(passwordEncoder.encode(usuarioDto.getPasswordUsuario()));
         usuario.setRolUsuario("usuario");
-        usuario.setConfirmado(false); // Usuario aún no confirmado
-
+        usuario.setConfirmado(false);
 
         usuarioRepositorio.save(usuario);
         System.out.println("✅ Usuario guardado con éxito.");
 
-        // Crear y guardar el registro temporal
         RegistroTemporalDao registroTemporal = new RegistroTemporalDao();
         registroTemporal.setUsuario(usuario);
         registroTemporal.setToken(token);
@@ -109,11 +101,8 @@ public class UsuarioServicio {
         System.out.println("✅ Registro temporal guardado con token: " + token);
     }
 
-
-
     @Transactional
     public boolean confirmarRegistro(String token) {
-        // 1️⃣ Buscar el registro temporal asociado al token
         Optional<RegistroTemporalDao> optionalRegistroTemporal = registroTemporalRepositorio.findByToken(token);
 
         if (optionalRegistroTemporal.isEmpty()) {
@@ -128,7 +117,6 @@ public class UsuarioServicio {
             return false;
         }
 
-        // 2️⃣ Obtener el usuario asociado al registro temporal
         UsuarioDao usuario = registroTemporal.getUsuario();
 
         if (usuario == null) {
@@ -136,18 +124,13 @@ public class UsuarioServicio {
             return false;
         }
 
-        // 3️⃣ Confirmar el usuario
         usuario.setConfirmado(true);
-        usuarioRepositorio.save(usuario); // Guardamos el cambio en la base de datos
+        usuarioRepositorio.save(usuario);
         System.out.println("✅ Usuario confirmado exitosamente: " + usuario.getEmailUsuario());
 
-        // 4️⃣ Eliminar el registro temporal después de confirmar
         registroTemporalRepositorio.delete(registroTemporal);
         System.out.println("✅ Registro temporal eliminado.");
 
         return true;
     }
-
-
-
 }

@@ -27,7 +27,8 @@ public class TokenServicio {
     public void enviarCorreoRecuperacion(String emailUsuario) {
         UsuarioDao usuario = usuarioRepositorio.findByEmailUsuario(emailUsuario);
         if (usuario == null) {
-            throw new RuntimeException("Usuario no encontrado");
+            System.out.println("⚠️ Usuario no encontrado: " + emailUsuario);
+            return; // No lanzar excepción, solo termina la ejecución
         }
 
         String token = UUID.randomUUID().toString();
@@ -37,13 +38,11 @@ public class TokenServicio {
         Optional<TokenDao> tokenExistente = tokenRepositorio.findByUsuario(usuario);
 
         if (tokenExistente.isPresent()) {
-            // Si el usuario ya tiene un token, actualiza el existente
             TokenDao tokenDao = tokenExistente.get();
             tokenDao.setToken(token);
             tokenDao.setFechaExpiracion(nuevaFechaExpiracion);
             tokenRepositorio.save(tokenDao);
         } else {
-            // Si no existe, crea uno nuevo
             TokenDao tokenDao = new TokenDao();
             tokenDao.setToken(token);
             tokenDao.setUsuario(usuario);
@@ -51,11 +50,12 @@ public class TokenServicio {
             tokenRepositorio.save(tokenDao);
         }
 
-        String enlaceRecuperacion = "http://localhost:8080/vistaProyectoFinal2/restablecerPassword.jsp?token=" + token;
-        emailServicio.enviarCorreo(emailUsuario, "Recuperación de Clave", "Usa este enlace para restablecer tu clave: " + enlaceRecuperacion);
+        String enlaceRecuperacion = "http://localhost:4200/cambiar-password?token=" + token;
+        
+        emailServicio.enviarCorreo(emailUsuario, "Recuperación de Clave",
+                "Para restablecer tu contraseña, haz clic en el siguiente enlace: " + enlaceRecuperacion);
+        System.out.println("✅ Correo de recuperación enviado a: " + emailUsuario);
     }
-
-
 
     public void restablecerClave(String token, String nuevaPassword) {
         TokenDao tokenDao = tokenRepositorio.findByToken(token)
