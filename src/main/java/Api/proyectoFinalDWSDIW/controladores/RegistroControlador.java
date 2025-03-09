@@ -1,7 +1,8 @@
 package Api.proyectoFinalDWSDIW.controladores;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import Api.proyectoFinalDWSDIW.daos.RegistroTemporalDao;
-import Api.proyectoFinalDWSDIW.daos.UsuarioDao;
 import Api.proyectoFinalDWSDIW.dtos.RegistroDto;
-import Api.proyectoFinalDWSDIW.repositorios.RegistroTemporalRepositorio;
-import Api.proyectoFinalDWSDIW.repositorios.UsuarioRepositorio;
 import Api.proyectoFinalDWSDIW.servicios.EmailServicio;
 import Api.proyectoFinalDWSDIW.servicios.UsuarioServicio;
 
@@ -27,23 +24,23 @@ import Api.proyectoFinalDWSDIW.servicios.UsuarioServicio;
 @RequestMapping("/api/registro")
 public class RegistroControlador {
 	@Autowired
-    private UsuarioRepositorio usuarioRepositorio;
-	@Autowired
-	private RegistroTemporalRepositorio registroTemporalRepositorio;
-	@Autowired
 	private EmailServicio emailServicio;
     @Autowired
     private UsuarioServicio usuarioServicio;
 
     @PostMapping("/usuario")
-    public ResponseEntity<String> registroUsuario(@RequestBody RegistroDto usuarioDto) {
+    public ResponseEntity<Map<String, String>> registroUsuario(@RequestBody RegistroDto usuarioDto) {
         try {
+            Map<String, String> response = new HashMap<>();
+
             if (usuarioDto.getEmailUsuario() == null || usuarioDto.getEmailUsuario().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El email es obligatorio.");
+                response.put("message", "El email es obligatorio.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
             if (usuarioServicio.emailExistsUsuario(usuarioDto.getEmailUsuario())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("El email ya está registrado.");
+                response.put("message", "El email ya está registrado.");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
             }
 
             String token = UUID.randomUUID().toString();
@@ -55,20 +52,26 @@ public class RegistroControlador {
             emailServicio.enviarCorreo(usuarioDto.getEmailUsuario(), "Confirma tu cuenta", 
                 "Haz clic en el siguiente enlace para activar tu cuenta: " + enlaceConfirmacion);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body("Correo de confirmación enviado.");
+            response.put("message", "Correo de confirmación enviado.");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response); // Ahora devuelve JSON válido
+
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor.");
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Error interno del servidor.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
     @GetMapping("/confirmar")
-    public ResponseEntity<String> confirmarUsuario(@RequestParam("token") String token) {
+    public ResponseEntity<Void> confirmarUsuario(@RequestParam("token") String token) {
         boolean confirmado = usuarioServicio.confirmarRegistro(token);
 
         if (confirmado) {
-            return ResponseEntity.ok("Cuenta confirmada. Inicia sesión en http://localhost:4200/login");
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Location", "http://localhost:4200/login"); // URL del proyecto Angular
+            return new ResponseEntity<>(headers, HttpStatus.FOUND); // 302 Found → Redirección
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token inválido o expirado.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 }

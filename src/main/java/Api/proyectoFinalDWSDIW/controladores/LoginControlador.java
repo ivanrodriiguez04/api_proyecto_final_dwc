@@ -21,8 +21,6 @@ public class LoginControlador {
     private UsuarioRepositorio usuarioRepositorio;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private UsuarioServicio usuarioServicio;
 
     @PostMapping("/validarUsuario")
     public ResponseEntity<String> autenticarUsuario(@RequestBody LoginDto usuario) {
